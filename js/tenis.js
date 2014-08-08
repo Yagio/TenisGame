@@ -193,7 +193,7 @@
     };
 
     Tenis.prototype.setPoint = function(playerName, point) {
-      if (playerName === this.p1N) {
+      if (playerName === 1) {
         return this.p1 = point;
       } else {
         return this.p2 = point;
@@ -242,6 +242,10 @@
 
     Tenis.prototype.setIdioma = function(idioma) {
       return this.idioma = idioma;
+    };
+
+    Tenis.prototype.WinIdioma = function() {
+      return this.idioma.getWin();
     };
 
     return Tenis;
@@ -460,16 +464,13 @@
           player = _this.entities[2].checkWinner();
           if (player) {
             _this.terminateRunLoop = true;
-            if (!_this.score) {
-              _this.score = [0, 0];
-            }
             _this.tenis.wonPoint(player);
             _this.notifyScore("<h1 class='animated tada'>" + (_this.tenis.getScore()) + "</h1>");
             _this.notifyStatus("" + (_this.tenis.getName(player)) + " gana el Set! Nuevo juego en 3 segundos.");
             _this.addRow();
             setTimeout(function() {
               _this.notifyStatus('');
-              _this.terminateRunLoop = false;
+              _this.terminateRunLoop = _this.getWinIdioma(_this.tenis.getScore());
               return _this.startNewGame();
             }, 3000);
           }
@@ -512,8 +513,23 @@
       return this.tenis.setIdioma(idioma);
     };
 
+    TenisGame.prototype.setPointGame = function(player, puntos) {
+      return this.tenis.setPoint(player, puntos);
+    };
+
     TenisGame.prototype.addRow = function() {
-      return $('#table-marcador tbody').append("<tr><td>" + (this.tenis.getPoint(1)) + "</td><td>" + (this.tenis.getPoint(2)) + "</td><td>" + (this.tenis.getScore()) + "</td></tr>");
+      return $('#table-marcador tbody').append("<tr><td class='pj1'>" + (this.tenis.getPoint(1)) + "</td><td class='pj2'>" + (this.tenis.getPoint(2)) + "</td><td>" + (this.tenis.getScore()) + "</td><td><a href='#' class='btn btn-danger eliminar-row'>Borrar</a></td></tr>");
+    };
+
+    TenisGame.prototype.getWinIdioma = function(marcador) {
+      var i, x;
+      i = this.tenis.WinIdioma() + this.tenis.getName(1);
+      x = this.tenis.WinIdioma() + this.tenis.getName(2);
+      if (i === marcador || x === marcador) {
+        return true;
+      } else {
+        return false;
+      }
     };
 
     TenisGame.prototype.clearCanvas = function() {
@@ -588,6 +604,17 @@
     } else {
       return alert('Rellena todos los campos');
     }
+  });
+
+  $('#table-marcador').on('click', '.eliminar-row', function(e) {
+    var pj1, pj2;
+    e.preventDefault();
+    pj1 = parseInt($(this).closest('tr').find('.pj1').text(), 10);
+    pj2 = parseInt($(this).closest('tr').find('.pj2').text(), 10);
+    game.setPointGame(1, pj1);
+    game.setPointGame(2, pj2);
+    game.main();
+    return $(this).closest('tr').nextAll('tr').remove();
   });
 
 }).call(this);

@@ -122,7 +122,7 @@ class Tenis
       @p2 += 1
 
   setPoint: (playerName, point) ->
-    if playerName is @p1N
+    if playerName is 1
       @p1 = point
     else
       @p2 = point
@@ -157,6 +157,9 @@ class Tenis
 
   setIdioma:(idioma) ->
     @idioma = idioma
+
+  WinIdioma: ->
+    return @idioma.getWin()
 
 class Figura
   x: 0, y: 0, vx: 0, vy: 0
@@ -260,14 +263,13 @@ class TenisGame
       player = @entities[2].checkWinner()
       if player
         @terminateRunLoop = true
-        @score = [0, 0] unless @score
         @tenis.wonPoint(player)
         @notifyScore "<h1 class='animated tada'>#{@tenis.getScore()}</h1>"
         @notifyStatus "#{@tenis.getName(player)} gana el Set! Nuevo juego en 3 segundos."
         @addRow()
         setTimeout =>
           @notifyStatus ''
-          @terminateRunLoop = false
+          @terminateRunLoop = @getWinIdioma(@tenis.getScore())
           @startNewGame()
         , 3000
 
@@ -300,8 +302,20 @@ class TenisGame
   setIdiomaTenis: (idioma) ->
     @tenis.setIdioma(idioma)
 
+  setPointGame: (player, puntos) ->
+    @tenis.setPoint(player, puntos)
+
   addRow: ->
-    $('#table-marcador tbody').append("<tr><td>#{@tenis.getPoint(1)}</td><td>#{@tenis.getPoint(2)}</td><td>#{@tenis.getScore()}</td></tr>")
+    $('#table-marcador tbody').append("<tr><td class='pj1'>#{@tenis.getPoint(1)}</td><td class='pj2'>#{@tenis.getPoint(2)}</td><td>#{@tenis.getScore()}</td><td><a href='#' class='btn btn-danger eliminar-row'>Borrar</a></td></tr>")
+
+  getWinIdioma: (marcador) ->
+    i = @tenis.WinIdioma() + @tenis.getName(1)
+    x = @tenis.WinIdioma() + @tenis.getName(2)
+
+    if i == marcador || x == marcador
+      return true
+    else
+      return false
 
   clearCanvas: ->
     @context.clearRect 0, 0, @canvas.width, @canvas.height
@@ -346,4 +360,12 @@ $('#btn-iniciar').click ->
   else
     alert 'Rellena todos los campos'
 
+$('#table-marcador').on 'click', '.eliminar-row', (e) ->
+  e.preventDefault()
+  pj1 = parseInt($(this).closest('tr').find('.pj1').text(),10)
+  pj2 = parseInt($(this).closest('tr').find('.pj2').text(),10)
+  game.setPointGame(1,pj1)
+  game.setPointGame(2,pj2)
+  game.main()
+  $(this).closest('tr').nextAll('tr').remove()
 
