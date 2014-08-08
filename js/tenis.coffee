@@ -127,6 +127,12 @@ class Tenis
     else
       @p2 = point
 
+  getPoint: (player) ->
+    if player is 1
+      return @p1
+    else
+      return @p2
+
   getScore: ->
     s = undefined
     if (@p1 < 4 and @p2 < 4) and (@p1 + @p2 < 6)
@@ -258,6 +264,7 @@ class TenisGame
         @tenis.wonPoint(player)
         @notifyScore "<h1 class='animated tada'>#{@tenis.getScore()}</h1>"
         @notifyStatus "#{@tenis.getName(player)} gana el Set! Nuevo juego en 3 segundos."
+        @addRow()
         setTimeout =>
           @notifyStatus ''
           @terminateRunLoop = false
@@ -292,6 +299,9 @@ class TenisGame
 
   setIdiomaTenis: (idioma) ->
     @tenis.setIdioma(idioma)
+
+  addRow: ->
+    $('#table-marcador tbody').append("<tr><td>#{@tenis.getPoint(1)}</td><td>#{@tenis.getPoint(2)}</td><td>#{@tenis.getScore()}</td></tr>")
 
   clearCanvas: ->
     @context.clearRect 0, 0, @canvas.width, @canvas.height
@@ -329,6 +339,8 @@ $('#btn-iniciar').click ->
           when 4 then game.setIdiomaTenis(new Frances)
     setTimeout ->
       game.main()
+      $('#table-marcador #j1').html(nombre_j1)
+      $('#table-marcador #j2').html(nombre_j2)
       $('#table-marcador').show()
     , 1500
   else

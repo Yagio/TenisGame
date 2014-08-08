@@ -200,6 +200,14 @@
       }
     };
 
+    Tenis.prototype.getPoint = function(player) {
+      if (player === 1) {
+        return this.p1;
+      } else {
+        return this.p2;
+      }
+    };
+
     Tenis.prototype.getScore = function() {
       var p, s;
       s = void 0;
@@ -458,6 +466,7 @@
             _this.tenis.wonPoint(player);
             _this.notifyScore("<h1 class='animated tada'>" + (_this.tenis.getScore()) + "</h1>");
             _this.notifyStatus("" + (_this.tenis.getName(player)) + " gana el Set! Nuevo juego en 3 segundos.");
+            _this.addRow();
             setTimeout(function() {
               _this.notifyStatus('');
               _this.terminateRunLoop = false;
@@ -501,6 +510,10 @@
 
     TenisGame.prototype.setIdiomaTenis = function(idioma) {
       return this.tenis.setIdioma(idioma);
+    };
+
+    TenisGame.prototype.addRow = function() {
+      return $('#table-marcador tbody').append("<tr><td>" + (this.tenis.getPoint(1)) + "</td><td>" + (this.tenis.getPoint(2)) + "</td><td>" + (this.tenis.getScore()) + "</td></tr>");
     };
 
     TenisGame.prototype.clearCanvas = function() {
@@ -568,6 +581,8 @@
       }
       return setTimeout(function() {
         game.main();
+        $('#table-marcador #j1').html(nombre_j1);
+        $('#table-marcador #j2').html(nombre_j2);
         return $('#table-marcador').show();
       }, 1500);
     } else {
